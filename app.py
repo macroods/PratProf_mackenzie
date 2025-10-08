@@ -1,5 +1,6 @@
 from flask import Flask, render_template, request, redirect, url_for, session, g
 import sqlite3
+from datetime import date
 
 app = Flask(__name__)
 app.secret_key = "segredo_simples"
@@ -57,7 +58,7 @@ def reserva(id):
         id_usuario = session["usuario_id"]
         numero_pessoas = request.form["numero_pessoas"]
         hora_reserva = request.form["hora_reserva"]
-        data_reserva = request.form["data_reserva"]
+        data_reserva = date.today().isoformat()
 
         db.execute('''
             INSERT INTO reserva (id_usuario, id_restaurante, data_reserva, hora_reserva, numero_pessoas)

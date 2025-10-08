@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Fazer Reserva</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="reserva-container">
+    <h2>{{ restaurante['nome'] }}</h2>
+    <p>Você selecionou o horário: <strong>{{ request.args.get('horario') }}</strong></p>
+    <form method="POST" action="{{ url_for('reserva', id=restaurante['id']) }}">
+    <label>Quantidade de pessoas:</label>
+    <input type="number" name="numero_pessoas" min="1" max="10" required>
+    <input type="hidden" name="hora_reserva" value="{{ request.args.get('horario') }}">
+    <input type="hidden" name="data_reserva" value="{{ request.args.get('data') }}">
+    <button type="submit" class="btn">Confirmar Reserva</button>
+    </form>
+  </div>
+</body>
+</html>

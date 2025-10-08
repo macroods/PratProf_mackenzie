@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Minhas Reservas</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <div class="container">
+    <h2>Minhas Reservas, {{ session['usuario_nome'] }}</h2>
+
+    {% if reservas %}
+      <table class="tabela-reservas">
+        <thead>
+          <tr>
+            <th>Restaurante</th>
+            <th>Data</th>
+            <th>Horário</th>
+            <th>Pessoas</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for reserva in reservas %}
+          <tr>
+            <td>{{ reserva['restaurante'] }}</td>
+            <td>{{ reserva['data_reserva'] }}</td>
+            <td>{{ reserva['hora_reserva'] }}</td>
+            <td>{{ reserva['numero_pessoas'] }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    {% else %}
+      <p>Você ainda não tem reservas.</p>
+    {% endif %}
+
+    <a href="{{ url_for('index') }}" class="btn">Voltar para restaurantes</a>
+    <a href="{{ url_for('logout') }}" class="btn">Sair</a>
+  </div>
+</body>
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Restaurantes</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header>
+    <h2>Bem-vindo, {{ nome }}!</h2>
+    <p>Escolha um restaurante para fazer sua reserva:</p>
+  </header>
+
+  <main id="listaRestaurantes">
+    {% for r in restaurantes %}
+      <div class="card">
+        <h3>{{ r['nome'] }}</h3>
+        <p>Horários disponíveis:</p>
+        {% for horario in r['horario_disponivel'].split(',') %}
+          <a class="btn" href="{{ url_for('reserva', id=r['id']) }}?horario={{ horario.strip() }}">{{ horario.strip() }}</a>
+        {% endfor %}
+      </div>
+    {% endfor %}
+  </main>
+</body>
+</html>

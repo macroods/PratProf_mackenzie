@@ -6,9 +6,10 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <div class="container">
+  <header style="background: #1976d2; color: #fff; padding: 24px 0; text-align: center;">
     <h2>Minhas Reservas, {{ session['usuario_nome'] }}</h2>
-
+  </header>
+  <div class="container">
     {% if reservas %}
       <table class="tabela-reservas">
         <thead>
@@ -34,8 +35,10 @@
       <p>Você ainda não tem reservas.</p>
     {% endif %}
 
-    <a href="{{ url_for('index') }}" class="btn">Voltar para restaurantes</a>
-    <a href="{{ url_for('logout') }}" class="btn">Sair</a>
+    <div style="margin-top: 24px;">
+      <a href="{{ url_for('index') }}" class="btn">Voltar para restaurantes</a>
+      <a href="{{ url_for('logout') }}" class="btn logout-btn">Sair</a>
+    </div>
   </div>
 </body>
 </html>

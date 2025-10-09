@@ -2,19 +2,20 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
-  <title>Login - Reserva de Restaurantes</title>
+  <title>Cadastro - Reserva de Restaurantes</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
   <div class="login-container">
-    <h2>Login do Cliente</h2>
-    <form action="/login" method="POST">
+    <h2>Cadastro de Cliente</h2>
+    <form action="{{ url_for('cadastro') }}" method="POST">
+      <input type="text" name="nome" placeholder="Nome" required>
       <input type="email" name="email" placeholder="Email" required>
       <input type="password" name="senha" placeholder="Senha" required>
-      <button type="submit">Entrar</button>
+      <button type="submit">Cadastrar</button>
     </form>
-    <form action="{{ url_for('cadastro') }}" method="get">
-      <button type="submit" class="cadastro-btn">Cadastrar</button>
+    <form action="{{ url_for('login') }}" method="get">
+      <button type="submit" class="cadastro-btn">Voltar ao Login</button>
     </form>
     {% if erro %}
       <p class="erro">{{ erro }}</p>

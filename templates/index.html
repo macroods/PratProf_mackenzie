@@ -23,7 +23,11 @@
         <h3>{{ r['nome'] }}</h3>
         <p>Horários disponíveis:</p>
         {% for horario in r['horario_disponivel'].split(',') %}
-          <a class="btn" href="{{ url_for('reserva', id=r['id']) }}?horario={{ horario.strip() }}">{{ horario.strip() }}</a>
+          {% if horario.strip() in r['horarios_reservados'] %}
+            <span class="btn horario-indisponivel">{{ horario.strip() }}</span>
+          {% else %}
+            <a class="btn" href="{{ url_for('reserva', id=r['id']) }}?horario={{ horario.strip() }}">{{ horario.strip() }}</a>
+          {% endif %}
         {% endfor %}
       </div>
     {% endfor %}

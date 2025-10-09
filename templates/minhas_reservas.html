@@ -18,6 +18,7 @@
             <th>Data</th>
             <th>Horário</th>
             <th>Pessoas</th>
+            <th>Cancelar</th>
           </tr>
         </thead>
         <tbody>
@@ -27,6 +28,11 @@
             <td>{{ reserva['data_reserva'] }}</td>
             <td>{{ reserva['hora_reserva'] }}</td>
             <td>{{ reserva['numero_pessoas'] }}</td>
+            <td>
+              <form action="{{ url_for('cancelar_reserva', reserva_id=reserva['id']) }}" method="post" style="display:inline;">
+                <button type="submit" class="btn btn-cancelar" title="Cancelar reserva">✖</button>
+              </form>
+            </td>
           </tr>
           {% endfor %}
         </tbody>

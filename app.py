@@ -44,7 +44,16 @@ def index():
 
     db = get_db()
     restaurantes = db.execute("SELECT * FROM restaurantes").fetchall()
-    return render_template("index.html", restaurantes=restaurantes, nome=session["usuario_nome"])
+    lista_restaurantes = []
+    for r in restaurantes:
+        horarios_reservados = db.execute(
+            "SELECT hora_reserva FROM reservas WHERE id_restaurante = ?", (r['id'],)
+        ).fetchall()
+        r = dict(r)
+        r['horarios_reservados'] = [h['hora_reserva'] for h in horarios_reservados]
+        lista_restaurantes.append(r)
+
+    return render_template("index.html", restaurantes=lista_restaurantes, nome=session["usuario_nome"])
 
 @app.route("/reserva/<int:id>", methods=["GET", "POST"])
 def reserva(id):
@@ -61,7 +70,7 @@ def reserva(id):
         data_reserva = date.today().isoformat()
 
         db.execute('''
-            INSERT INTO reserva (id_usuario, id_restaurante, data_reserva, hora_reserva, numero_pessoas)
+            INSERT INTO reservas (id_usuario, id_restaurante, data_reserva, hora_reserva, numero_pessoas)
             VALUES (?, ?, ?, ?, ?)
         ''', (id_usuario, id, data_reserva, hora_reserva, numero_pessoas))
         db.commit()
@@ -77,7 +86,7 @@ def minhas_reservas():
     db = get_db()
     reservas = db.execute('''
         SELECT r.id, re.nome AS restaurante, r.data_reserva, r.hora_reserva, r.numero_pessoas
-        FROM reserva r
+        FROM reservas r
         JOIN restaurantes re ON r.id_restaurante = re.id
         WHERE r.id_usuario = ?
         ORDER BY r.data_reserva, r.hora_reserva
@@ -107,6 +116,13 @@ def cadastro():
         db.commit()
         return redirect(url_for("login"))
     return render_template("cadastro.html")
+
+@app.route("/cancelar_reserva/<int:reserva_id>", methods=["POST"])
+def cancelar_reserva(reserva_id):
+    db = get_db()
+    db.execute("DELETE FROM reservas WHERE id = ?", (reserva_id,))
+    db.commit()
+    return redirect(url_for("minhas_reservas"))
 
 if __name__ == "__main__":
     app.run(debug=True)

@@ -35,7 +35,7 @@ cur.executemany(
 
 # Tabela de reservas
 cur.execute('''
-CREATE TABLE IF NOT EXISTS reserva (
+CREATE TABLE IF NOT EXISTS reservas (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     id_usuario INTEGER NOT NULL,
     id_restaurante INTEGER NOT NULL,

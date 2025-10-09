@@ -60,6 +60,25 @@ button:hover, .btn:hover {
   padding: 18px;
   background: #fff;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+
+.card p {
+    margin-bottom: 8px;
+}
+
+.card-horarios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-bottom: 12px;
+}
+
+.card .btn, .card .horario-indisponivel {
+    margin: 4px 2px;
 }
 
 .erro {
@@ -155,4 +174,28 @@ button:hover, .btn:hover {
 
 .logout-btn:hover {
     background-color: #ff3333;
+}
+
+.horario-indisponivel {
+    background: #ff6666;
+    color: #fff;
+    padding: 8px 16px;
+    border-radius: 4px;
+    margin: 2px;
+    display: inline-block;
+    cursor: not-allowed;
+    opacity: 0.7;
+}
+
+.btn-cancelar {
+    background: #ff6666;
+    color: #fff;
+    border: none;
+    padding: 4px 8px;
+    border-radius: 50%;
+    font-size: 0.9rem;
+    cursor: pointer;
+}
+.btn-cancelar:hover {
+    background: #ff3333;
 }

@@ -1,6 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, session, g
 import sqlite3
 from datetime import date
+from werkzeug.security import generate_password_hash, check_password_hash
 
 app = Flask(__name__)
 app.secret_key = "segredo_simples"
@@ -124,5 +125,101 @@ def cancelar_reserva(reserva_id):
     db.commit()
     return redirect(url_for("minhas_reservas"))
 
+@app.route("/cadastro_restaurante", methods=["GET", "POST"])
+def cadastro_restaurante():
+    if request.method == "POST":
+        nome = request.form.get("nome", "").strip()
+        email = request.form.get("email", "").strip().lower()
+        senha = request.form.get("senha", "").strip()
+        horarios = request.form.get("horarios", "").strip()
+        if not nome or not email or not senha:
+            return render_template("cadastro_restaurante.html", erro="Preencha todos os campos")
+        db = get_db()
+        # verifica email único
+        existente = db.execute("SELECT id FROM restaurantes WHERE email = ?", (email,)).fetchone()
+        if existente:
+            return render_template("cadastro_restaurante.html", erro="Email já cadastrado")
+        senha_hash = generate_password_hash(senha)
+        db.execute(
+            "INSERT INTO restaurantes (nome, email, senha, horario_disponivel) VALUES (?, ?, ?, ?)",
+            (nome, email, senha_hash, horarios)
+        )
+        db.commit()
+        return redirect(url_for("login"))
+    return render_template("cadastro_restaurante.html")
+
+# --- rota de login para restaurante (usa o nome do restaurante) ---
+@app.route("/login_restaurante", methods=["POST"])
+def login_restaurante():
+    email = request.form.get("email_rest", "").strip().lower()
+    senha = request.form.get("senha_rest", "").strip()
+    if not email or not senha:
+        return render_template("login.html", erro="Email e senha obrigatórios")
+    db = get_db()
+    row = db.execute("SELECT * FROM restaurantes WHERE email = ?", (email,)).fetchone()
+    if not row:
+        return render_template("login.html", erro="Email ou senha inválidos")
+    if not check_password_hash(row["senha"], senha):
+        return render_template("login.html", erro="Email ou senha inválidos")
+    # sucesso: criar sessão específica para restaurante
+    session.clear()
+    session["restaurante_id"] = row["id"]
+    session["restaurante_nome"] = row["nome"]
+    return redirect(url_for("minhas_reservas_restaurante"))
+
+# --- área do restaurante: mostra reservas deste restaurante e horários disponíveis ---
+@app.route("/minhas_reservas_restaurante")
+def minhas_reservas_restaurante():
+    if "restaurante_id" not in session:
+        return redirect(url_for("login"))
+    rest_id = session["restaurante_id"]
+    db = get_db()
+    reservas = db.execute("""
+        SELECT r.id, u.nome AS cliente_nome, r.data_reserva, r.hora_reserva, r.numero_pessoas
+        FROM reservas r
+        LEFT JOIN usuarios u ON r.id_usuario = u.id
+        WHERE r.id_restaurante = ?
+        ORDER BY r.data_reserva, r.hora_reserva
+    """, (rest_id,)).fetchall()
+    # carrega horários disponíveis e transforma em lista
+    row = db.execute("SELECT horario_disponivel FROM restaurantes WHERE id = ?", (rest_id,)).fetchone()
+    horarios = []
+    if row and row["horario_disponivel"]:
+        horarios = [h.strip() for h in row["horario_disponivel"].split(",") if h.strip()]
+    return render_template("minhas_reservas_restaurante.html", reservas=reservas, horarios=horarios)
+
+# --- remover um horário disponível do restaurante (POST) ---
+@app.route("/remover_horario/<int:rest_id>", methods=["POST"])
+def remover_horario(rest_id):
+    if "restaurante_id" not in session or session["restaurante_id"] != rest_id:
+        return redirect(url_for("login"))
+    horario = request.form.get("horario", "").strip()
+    if not horario:
+        return redirect(url_for("minhas_reservas_restaurante"))
+    db = get_db()
+    row = db.execute("SELECT horario_disponivel FROM restaurantes WHERE id = ?", (rest_id,)).fetchone()
+    if not row:
+        return redirect(url_for("minhas_reservas_restaurante"))
+    horarios = [h.strip() for h in (row["horario_disponivel"] or "").split(",") if h.strip()]
+    horarios = [h for h in horarios if h != horario]
+    novo = ",".join(horarios)
+    db.execute("UPDATE restaurantes SET horario_disponivel = ? WHERE id = ?", (novo, rest_id))
+    db.commit()
+    return redirect(url_for("minhas_reservas_restaurante"))
+
+# --- excluir restaurante (apaga restaurante e reservas relacionadas) ---
+@app.route("/excluir_restaurante/<int:rest_id>", methods=["POST"])
+def excluir_restaurante(rest_id):
+    if "restaurante_id" not in session or session["restaurante_id"] != rest_id:
+        return redirect(url_for("login"))
+    db = get_db()
+    db.execute("DELETE FROM reservas WHERE id_restaurante = ?", (rest_id,))
+    db.execute("DELETE FROM restaurantes WHERE id = ?", (rest_id,))
+    db.commit()
+    # limpa sessão do restaurante e volta ao login
+    session.pop("restaurante_id", None)
+    session.pop("restaurante_nome", None)
+    return redirect(url_for("login"))
+
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=True, use_reloader=False)

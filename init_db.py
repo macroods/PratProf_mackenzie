@@ -13,23 +13,30 @@ CREATE TABLE IF NOT EXISTS usuarios (
 );
 """)
 
+# Inserir usuário de exemplo
+cur.execute(
+    "INSERT OR IGNORE INTO usuarios (nome, email, senha) VALUES (?, ?, ?)",
+    ('João', 'joao@email.com', '123')
+)
+
 # Tabela de restaurantes
 cur.execute("""
 CREATE TABLE IF NOT EXISTS restaurantes (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     nome TEXT UNIQUE NOT NULL,
+    email TEXT UNIQUE,
+    senha TEXT,
     horario_disponivel TEXT NOT NULL
 );
 """)
 
-# Inserir dados de exemplo
-cur.execute("INSERT OR IGNORE INTO usuarios (nome, email, senha) VALUES ('João', 'joao@email.com', '123')")
+# Inserir restaurantes de exemplo
 cur.executemany(
-    "INSERT OR IGNORE INTO restaurantes (nome, horario_disponivel) VALUES (?, ?)",
+    "INSERT OR IGNORE INTO restaurantes (nome, email, senha, horario_disponivel) VALUES (?, ?, ?, ?)",
     [
-        ("Sabor da Serra", "12:00, 13:00, 14:00"),
-        ("La Pasta Bella", "19:00, 20:00, 21:00"),
-        ("Sushi Zen", "18:00, 19:30, 21:00"),
+        ("Sabor da Serra", "sabor@exemplo.com", "rest123", "12:00, 13:00, 14:00"),
+        ("La Pasta Bella", "lapasta@exemplo.com", "rest123", "19:00, 20:00, 21:00"),
+        ("Sushi Zen", "sushizen@exemplo.com", "rest123", "18:00, 19:30, 21:00"),
     ]
 )
 

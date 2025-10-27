@@ -1,62 +1,84 @@
-
-// --- Dados básicos ---
+// script para renderizar e filtrar restaurantes
 
 const lista = document.getElementById("listaRestaurantes");
-const modal = document.getElementById("modal");
-const modalNome = document.getElementById("modalNome");
-const dataReserva = document.getElementById("dataReserva");
-const horarioReserva = document.getElementById("horarioReserva");
-const btnCancelar = document.getElementById("btnCancelar");
-const btnConfirmar = document.getElementById("btnConfirmar");
+const searchInput = document.getElementById('searchInput');
 
-let restauranteAtual = null;
+// usa a variável injetada pelo template
+const restaurantes = window.restaurantes || [];
 
-// Renderiza a lista
+// renderiza todos os restaurantes
 function renderRestaurantes() {
+  if (!lista) return;
   lista.innerHTML = "";
+
   restaurantes.forEach(r => {
     const card = document.createElement("div");
-    card.className = "restaurante-card";
+    card.className = "restaurante-card card";
+    const nome = r.nome || r['nome'] || 'Sem nome';
+
+    // horários reservados (array de strings)
+    const reservados = (r.horarios_reservados || r['horarios_reservados'] || []).map(s => String(s).trim());
+
+    // montar horários: suporta campo horario_disponivel (string) ou r.horarios (array)
+    let horariosHtml = "";
+    if (r.horario_disponivel && typeof r.horario_disponivel === "string") {
+      horariosHtml = r.horario_disponivel.split(',').map(h => {
+        const hh = h.trim();
+        if (reservados.includes(hh)) {
+          // horário indisponível
+          return `<span class="horario-item horario-indisponivel">${hh}</span>`;
+        } else {
+          // horário disponível
+          return `<button class="horario-item btn" data-h="${hh}" data-id="${r.id || r['id'] || ''}">${hh}</button>`;
+        }
+      }).join('');
+    } else if (Array.isArray(r.horarios)) {
+      horariosHtml = r.horarios.map(h => {
+        const hh = String(h).trim();
+        if (reservados.includes(hh)) {
+          return `<span class="horario-item horario-indisponivel">${hh}</span>`;
+        } else {
+          return `<button class="horario-item btn" data-h="${hh}" data-id="${r.id || r['id'] || ''}">${hh}</button>`;
+        }
+      }).join('');
+    }
+
     card.innerHTML = `
-      <h3 class="font-semibold text-lg">${r.nome}</h3>
-      <div class="flex flex-wrap gap-2 mt-2">
-        ${r.horarios.map(h => `<span class="px-2 py-1 border rounded-lg text-sm">${h}</span>`).join("")}
-      </div>
-      <button class="btn-reservar mt-4" data-id="${r.id}">Reservar</button>
+      <h3>${nome}</h3>
+      <div class="card-horarios">${horariosHtml}</div>
     `;
     lista.appendChild(card);
   });
 
-  document.querySelectorAll(".btn-reservar").forEach(btn => {
-    btn.addEventListener("click", () => abrirModal(+btn.dataset.id));
+  // listeners para horários disponíveis: navega para /reserva/<id>?horario=...
+  document.querySelectorAll(".horario-item.btn").forEach(el => {
+    el.addEventListener("click", () => {
+      const id = el.dataset.id;
+      const h = el.dataset.h;
+      if (!id || !h) return;
+      const url = `/reserva/${id}?horario=${encodeURIComponent(h)}`;
+      location.href = url;
+    });
   });
 }
 
-// Abre modal
-function abrirModal(id) {
-  restauranteAtual = restaurantes.find(r => r.id === id);
-  modalNome.textContent = restauranteAtual.nome;
-  horarioReserva.innerHTML = restauranteAtual.horarios.map(h => `<option value="${h}">${h}</option>`).join("");
-  modal.classList.remove("hidden");
+// filtro: só aplica quando há texto
+function setupFiltro() {
+  if (!searchInput) return;
+  searchInput.addEventListener('input', function() {
+    const q = this.value.trim().toLowerCase();
+    const cards = document.querySelectorAll('#listaRestaurantes .restaurante-card');
+    if (!q) {
+      cards.forEach(c => c.style.display = '');
+      return;
+    }
+    cards.forEach(card => {
+      const nome = (card.querySelector('h3')?.textContent || '').toLowerCase();
+      card.style.display = nome.includes(q) ? '' : 'none';
+    });
+  });
 }
 
-// Fecha modal
-function fecharModal() {
-  modal.classList.add("hidden");
-}
-
-btnCancelar.addEventListener("click", fecharModal);
-modal.addEventListener("click", e => { if (e.target === modal) fecharModal(); });
-
-btnConfirmar.addEventListener("click", () => {
-  const data = dataReserva.value;
-  const horario = horarioReserva.value;
-  if (!data || !horario) {
-    alert("Escolha data e horário para confirmar!");
-    return;
-  }
-  alert(`Reserva confirmada em ${restauranteAtual.nome} para ${data} às ${horario}.`);
-  fecharModal();
-});
-
+// inicializa
 renderRestaurantes();
+setupFiltro();

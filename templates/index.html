@@ -6,31 +6,37 @@
   <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
 <body>
-  <header>
-    <h2>Bem-vindo(a), {{ nome }}!</h2>
-    <p>Escolha um restaurante para fazer sua reserva:</p>
-    <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
-      <button type="submit" class="btn logout-btn">Logout</button>
-    </form>
-    <form action="{{ url_for('minhas_reservas') }}" method="get" style="display:inline; margin-left: 10px;">
-      <button type="submit" class="btn reserva-btn">Minhas Reservas</button>
-    </form>
+  <!-- header -->
+  <header style="background: #1976d2; color: #fff; padding: 20px 0; text-align: center;">
+    <h2 style="margin:0;">Bem-vindo(a), {{ nome }}!</h2>
+    <p style="margin:6px 0 12px 0;">Escolha um restaurante para fazer sua reserva:</p>
+
+    <div style="display:flex; justify-content:center; gap:10px; margin-top:6px;">
+      <form action="{{ url_for('minhas_reservas') }}" method="get" style="display:inline;">
+        <button type="submit" class="btn">Minhas Reservas</button>
+      </form>
+      <form action="{{ url_for('logout') }}" method="get" style="display:inline;">
+        <button type="submit" class="btn logout-btn">Logout</button>
+      </form>
+    </div>
   </header>
 
+  <!-- Barra de pesquisa -->
+  <div style="display:flex; justify-content:center; padding:12px 0; background:#f5f7fb;">
+    <input id="searchInput" type="search" placeholder="Buscar restaurantes..."
+           style="padding:8px 10px; border-radius:6px; border: 1px solid #d6dde6; width:320px; max-width:90%;">
+  </div>
+
+  <!-- injetar lista de restaurantes do servidor para o script.js -->
+  <script>
+    window.restaurantes = {{ restaurantes|default([])|tojson }};
+  </script>
+
   <main id="listaRestaurantes">
-    {% for r in restaurantes %}
-      <div class="card">
-        <h3>{{ r['nome'] }}</h3>
-        <p>Horários disponíveis:</p>
-        {% for horario in r['horario_disponivel'].split(',') %}
-          {% if horario.strip() in r['horarios_reservados'] %}
-            <span class="btn horario-indisponivel">{{ horario.strip() }}</span>
-          {% else %}
-            <a class="btn" href="{{ url_for('reserva', id=r['id']) }}?horario={{ horario.strip() }}">{{ horario.strip() }}</a>
-          {% endif %}
-        {% endfor %}
-      </div>
-    {% endfor %}
+    <!-- cards serão renderizados pelo script.js -->
   </main>
+
+  <!-- script principal -->
+  <script src="{{ url_for('static', filename='script.js') }}"></script>
 </body>
 </html>

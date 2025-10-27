@@ -35,7 +35,7 @@ input, button {
 }
 
 button, .btn {
-  background-color: #4f46e5;
+  background-color: #9b99c7;
   color: white;
   border: none;
   cursor: pointer;
@@ -74,7 +74,7 @@ button:hover, .btn:hover {
     flex-wrap: wrap;
     gap: 8px;
     justify-content: center;
-    margin-bottom: 12px;
+    margin-top: 8px;
 }
 
 .card .btn, .card .horario-indisponivel {
@@ -177,14 +177,14 @@ button:hover, .btn:hover {
 }
 
 .horario-indisponivel {
-    background: #ff6666;
+    background-color: #ff6666;
     color: #fff;
-    padding: 8px 16px;
-    border-radius: 4px;
-    margin: 2px;
+    padding: 6px 10px;
+    border-radius: 6px;
+    margin: 4px;
     display: inline-block;
     cursor: not-allowed;
-    opacity: 0.7;
+    opacity: 0.95;
 }
 
 .btn-cancelar {
@@ -198,4 +198,24 @@ button:hover, .btn:hover {
 }
 .btn-cancelar:hover {
     background: #ff3333;
+}
+
+
+.card-horarios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    justify-content: center;
+    margin-top: 8px;
+}
+
+
+.horario-item.btn {
+    background: #1976d2;
+    color: #fff;
+    border: none;
+    padding: 6px 10px;
+    border-radius: 6px;
+    cursor: pointer;
+    margin: 4px;
 }

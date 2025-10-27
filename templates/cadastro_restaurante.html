@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Cadastro de Restaurante</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body style="background:#f4f6fb;">
+  <header style="background: #1976d2; color: #fff; padding: 16px 0; text-align: center;">
+    <h1 style="margin:0; font-size:1.1rem;">Cadastro de Restaurante</h1>
+  </header>
+
+  <div class="login-container" style="max-width:520px; margin:32px auto; padding:20px;">
+    <h2>Novo Restaurante</h2>
+    <form action="{{ url_for('cadastro_restaurante') }}" method="POST">
+      <input type="text" name="nome" placeholder="Nome do Restaurante" required>
+      <input type="email" name="email" placeholder="Email (login)" required style="margin-top:8px;">
+      <input type="password" name="senha" placeholder="Senha" required style="margin-top:8px;">
+      <label for="horarios" style="display:block; margin-top:8px; font-size:0.9rem;">Horários disponíveis (separados por vírgula)</label>
+      <input type="text" id="horarios" name="horarios" placeholder="Ex: 12:00,13:00,14:00" required>
+      <button type="submit" style="margin-top:10px;">Cadastrar Restaurante</button>
+    </form>
+
+    <form action="{{ url_for('login') }}" method="get" style="margin-top:12px;">
+      <button type="submit" class="cadastro-btn">Voltar</button>
+    </form>
+
+    {% if erro %}
+      <p class="erro">{{ erro }}</p>
+    {% endif %}
+  </div>
+</body>
+</html>

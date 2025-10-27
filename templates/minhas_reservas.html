@@ -30,7 +30,10 @@
             <td>{{ reserva['numero_pessoas'] }}</td>
             <td>
               <form action="{{ url_for('cancelar_reserva', reserva_id=reserva['id']) }}" method="post" style="display:inline;">
-                <button type="submit" class="btn btn-cancelar" title="Cancelar reserva">✖</button>
+                <button type="submit" class="btn btn-cancelar" title="Cancelar reserva"
+                        style="background:#ff6666;color:#fff;border:none;padding:6px 10px;border-radius:8px;cursor:pointer;font-size:0.95rem;">
+                  Cancelar
+                </button>
               </form>
             </td>
           </tr>

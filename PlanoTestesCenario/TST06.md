@@ -1,6 +1,6 @@
 ## TST06 Login com senha incorreta
 
-**Caso de uso em que se baseia:** Login
+**Caso de uso em que se baseia:** Login de cliente
 
 **Cenário:** Fluxo principal
 
